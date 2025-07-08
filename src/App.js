@@ -2,7 +2,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { Coffee, Users, RotateCcw, BarChart3, Trophy, Calendar, UserPlus, X } from 'lucide-react';
 
 const BIN_ID = process.env.REACT_APP_JSONBIN_BIN_ID;
-const API_KEY = '$2a$10$DnO/7.T9TYW8KlXg1lhoRu4jxMaIw6jmmgwf5DPMLI/l2fBDLkEKu';
+const API_KEY = "$2a$10$DnO/7.T9TYW8KlXg1lhoRu4jxMaIw6jmmgwf5DPMLI/l2fBDLkEKu";
 const API_URL = `https://api.jsonbin.io/v3/b/${BIN_ID}`;
 
 export default function CoffeeGame() {
@@ -257,7 +257,7 @@ export default function CoffeeGame() {
           </div>
           <p className="text-amber-700">누가 커피를 사게 될까요?</p>
           
-          {/* 통계 버튼 */}
+          {/* 통계/추가 버튼 */}
           <div className="flex justify-center gap-2 mt-4">
             <button
               onClick={() => setShowStats(!showStats)}
@@ -266,14 +266,13 @@ export default function CoffeeGame() {
               <BarChart3 className="w-4 h-4 mr-1" />
               통계보기
             </button>
-            {gameHistory.length > 0 && (
-              <button
-                onClick={clearHistory}
-                className="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors"
-              >
-                기록삭제
-              </button>
-            )}
+            <button
+              onClick={addPlayer}
+              className="flex items-center px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition-colors shadow-md"
+            >
+              <UserPlus className="w-4 h-4 mr-2" />
+              참가자 추가
+            </button>
           </div>
         </div>
 
@@ -415,18 +414,7 @@ export default function CoffeeGame() {
             </button>
           )}
         </div>
-
-        {/* 참가자 추가 버튼 */}
-        <div className="flex justify-center mt-4">
-          <button
-            onClick={addPlayer}
-            className="flex items-center px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition-colors shadow-md"
-          >
-            <UserPlus className="w-4 h-4 mr-2" />
-            참가자 추가
-          </button>
-        </div>
-
+        
         {/* 참가자 목록 */}
         <div className="mt-8 space-y-3">
           {players.map((player, index) => (
