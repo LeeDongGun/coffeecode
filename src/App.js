@@ -459,6 +459,13 @@ export default function CoffeeGame() {
             </div>
           ))}
         </div>
+
+        {/* 버전 정보 */}
+        {process.env.REACT_APP_VERSION && (
+          <div className="text-center text-xs text-gray-500 mt-8">
+            Version {process.env.REACT_APP_VERSION}
+          </div>
+        )}
       </div>
     </div>
   );
