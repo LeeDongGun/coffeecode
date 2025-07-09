@@ -163,13 +163,60 @@ export default function CoffeeGame() {
     }
   };
 
-  const selectRandomPlayer = () => {
+  const selectRandomPlayer = useCallback(() => {
     if (players.length === 0) return;
-    
+
+    // 참가자 목록을 랜덤으로 섞기 (Fisher-Yates shuffle)
+    const shuffledPlayers = [...players];
+    for (let i = shuffledPlayers.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [shuffledPlayers[i], shuffledPlayers[j]] = [shuffledPlayers[j], shuffledPlayers[i]];
+    }
+    setPlayers(shuffledPlayers);
+
     setIsSpinning(true);
     setWinner(null);
     setCountdown(3);
-    
+
+    const startSpinning = () => {
+      const finalWinnerIndex = Math.floor(Math.random() * shuffledPlayers.length);
+      let currentIndex = 0;
+      const minSpins = 25;
+      const extraSpins = Math.floor(Math.random() * 16);
+      const totalSpins = minSpins + extraSpins;
+      const targetIndex = totalSpins % shuffledPlayers.length;
+      const adjustment = (finalWinnerIndex - targetIndex + shuffledPlayers.length) % shuffledPlayers.length;
+      const finalSpinCount = totalSpins + adjustment;
+
+      let speed = 50;
+      let spinsCompleted = 0;
+
+      const spin = (index) => {
+        setCurrentHighlight(index);
+        spinsCompleted++;
+
+        const progress = spinsCompleted / finalSpinCount;
+        if (progress > 0.9) speed += 100;
+        else if (progress > 0.8) speed += 60;
+        else if (progress > 0.6) speed += 30;
+        else if (progress > 0.4) speed += 15;
+        else if (progress > 0.2) speed += 8;
+        else speed += 2;
+
+        if (spinsCompleted < finalSpinCount) {
+          const nextIndex = (index + 1) % shuffledPlayers.length;
+          setTimeout(() => spin(nextIndex), speed);
+        } else {
+          setWinner(shuffledPlayers[index]);
+          setIsSpinning(false);
+          if (!dontRecord) {
+            saveGameResult(shuffledPlayers[index]);
+          }
+        }
+      };
+      spin(currentIndex);
+    };
+
     // 카운트다운 효과
     const countdownInterval = setInterval(() => {
       setCountdown(prev => {
@@ -181,81 +228,8 @@ export default function CoffeeGame() {
         return prev - 1;
       });
     }, 1000);
-  };
+  }, [players, dontRecord, saveGameResult]);
   
-  const startSpinning = () => {
-    // 1. 먼저 최종 승자를 미리 결정
-    const finalWinnerIndex = Math.floor(Math.random() * players.length);
-    
-    // 2. 시작 위치를 0부터 시작 (순서대로 움직이기 위해)
-    let currentIndex = 0;
-    
-    // 3. 최소 스핀 횟수 (시각적 효과를 위해)
-    const minSpins = 25;
-    
-    // 4. 추가 스핀 횟수 (랜덤하게 0~15 추가)
-    const extraSpins = Math.floor(Math.random() * 16);
-    
-    // 5. 최종 승자에 맞춰 정확한 총 스핀 횟수 계산
-    const totalSpins = minSpins + extraSpins;
-    const targetIndex = totalSpins % players.length;
-    
-    // 6. 최종 승자 인덱스에 맞춰 스핀 횟수 조정
-    const adjustment = (finalWinnerIndex - targetIndex + players.length) % players.length;
-    const finalSpinCount = totalSpins + adjustment;
-    
-    let speed = 50; // 시작 속도 (빠르게 시작)
-    let spinsCompleted = 0;
-  
-    const spin = (index) => {
-      // 현재 하이라이트할 인덱스 설정
-      setCurrentHighlight(index);
-      spinsCompleted++;
-  
-      // 자연스러운 속도 변화 (빠르게 시작 -> 점진적 감속)
-      const progress = spinsCompleted / finalSpinCount;
-      
-      if (progress > 0.9) {
-        // 마지막 10% - 매우 느리게
-        speed += 100;
-      } else if (progress > 0.8) {
-        // 80-90% - 급격히 감속
-        speed += 60;
-      } else if (progress > 0.6) {
-        // 60-80% - 중간 감속
-        speed += 30;
-      } else if (progress > 0.4) {
-        // 40-60% - 약간 감속
-        speed += 15;
-      } else if (progress > 0.2) {
-        // 20-40% - 조금 감속
-        speed += 8;
-      } else {
-        // 0-20% - 빠른 속도 유지
-        speed += 2;
-      }
-  
-      if (spinsCompleted < finalSpinCount) {
-        // 다음 인덱스로 순서대로 이동
-        const nextIndex = (index + 1) % players.length;
-        setTimeout(() => spin(nextIndex), speed);
-      } else {
-        // 최종 결과 표시 - 승자 아이템 강조
-        setWinner(players[index]);
-        setIsSpinning(false);
-        // 하이라이트는 유지 (제거하지 않음)
-  
-        // 게임 결과 저장
-        if (!dontRecord) {
-          saveGameResult(players[index]);
-        }
-      }
-    };
-  
-    // 첫 번째 스핀 시작
-    spin(currentIndex);
-  };
-
   const handleNameEdit = (index, newName) => {
     if (newName.trim()) {
       const newPlayers = [...players];
@@ -465,8 +439,10 @@ export default function CoffeeGame() {
             <div 
               key={index} 
               className={`flex items-center justify-between p-4 rounded-lg transition-all duration-300 ${
-                isSpinning 
-                  ? (currentHighlight === index ? 'bg-amber-300 scale-110 shadow-lg' : 'bg-white opacity-70')
+                (isSpinning || winner) && currentHighlight === index
+                  ? 'bg-amber-300 scale-110 shadow-lg'
+                  : isSpinning
+                  ? 'bg-white opacity-70'
                   : 'bg-white'
               }`}
             >
