@@ -18,6 +18,7 @@ export default function CoffeeGame() {
   const [stats, setStats] = useState({});
   const [isDataLoaded, setIsDataLoaded] = useState(false);
   const [showAllStats, setShowAllStats] = useState(false);
+  const [dontRecord, setDontRecord] = useState(false);
 
   const calculateStats = useCallback(() => {
     const newStats = {};
@@ -49,8 +50,7 @@ export default function CoffeeGame() {
     const loadGameData = async () => {
       console.log('Attempting to load data from JSONBin.io...');
       console.log('BIN ID:', BIN_ID);
-      //console.log('API Key:', API_KEY ? '******' : '(not set)');
-      console.log('API Key:', API_KEY);
+      console.log('API Key:', API_KEY ? '******' : '(not set)');
 
       if (!API_KEY || API_KEY === 'YOUR_API_KEY_HERE' || !BIN_ID) {
         console.warn('JSONBin API Key or Bin ID is not configured. Skipping server load.');
@@ -182,46 +182,78 @@ export default function CoffeeGame() {
       });
     }, 1000);
   };
-
+  
   const startSpinning = () => {
-    let currentIndex = 0;
-    let speed = 100; // 시작 속도 (ms)
-    let iterations = 0;
-    const maxIterations = 30; // 총 회전 횟수
+    // 1. 먼저 최종 승자를 미리 결정
+    const finalWinnerIndex = Math.floor(Math.random() * players.length);
     
-    const spin = () => {
-      setCurrentHighlight(currentIndex);
-      currentIndex = (currentIndex + 1) % players.length;
-      iterations++;
+    // 2. 시작 위치를 0부터 시작 (순서대로 움직이기 위해)
+    let currentIndex = 0;
+    
+    // 3. 최소 스핀 횟수 (시각적 효과를 위해)
+    const minSpins = 25;
+    
+    // 4. 추가 스핀 횟수 (랜덤하게 0~15 추가)
+    const extraSpins = Math.floor(Math.random() * 16);
+    
+    // 5. 최종 승자에 맞춰 정확한 총 스핀 횟수 계산
+    const totalSpins = minSpins + extraSpins;
+    const targetIndex = totalSpins % players.length;
+    
+    // 6. 최종 승자 인덱스에 맞춰 스핀 횟수 조정
+    const adjustment = (finalWinnerIndex - targetIndex + players.length) % players.length;
+    const finalSpinCount = totalSpins + adjustment;
+    
+    let speed = 50; // 시작 속도 (빠르게 시작)
+    let spinsCompleted = 0;
+  
+    const spin = (index) => {
+      // 현재 하이라이트할 인덱스 설정
+      setCurrentHighlight(index);
+      spinsCompleted++;
+  
+      // 자연스러운 속도 변화 (빠르게 시작 -> 점진적 감속)
+      const progress = spinsCompleted / finalSpinCount;
       
-      // 점점 느려지는 효과
-      if (iterations > 15) {
-        speed += 20;
-      } else if (iterations > 10) {
-        speed += 10;
-      } else if (iterations > 5) {
-        speed += 5;
-      }
-      
-      if (iterations < maxIterations) {
-        setTimeout(spin, speed);
+      if (progress > 0.9) {
+        // 마지막 10% - 매우 느리게
+        speed += 100;
+      } else if (progress > 0.8) {
+        // 80-90% - 급격히 감속
+        speed += 60;
+      } else if (progress > 0.6) {
+        // 60-80% - 중간 감속
+        speed += 30;
+      } else if (progress > 0.4) {
+        // 40-60% - 약간 감속
+        speed += 15;
+      } else if (progress > 0.2) {
+        // 20-40% - 조금 감속
+        speed += 8;
       } else {
-        // 최종 선택
-        const finalIndex = Math.floor(Math.random() * players.length);
-        setCurrentHighlight(finalIndex);
-        
-        setTimeout(() => {
-          setWinner(players[finalIndex]);
-          setIsSpinning(false);
-          setCurrentHighlight(-1);
-          
-          // 게임 결과 저장
-          saveGameResult(players[finalIndex]);
-        }, 1000);
+        // 0-20% - 빠른 속도 유지
+        speed += 2;
+      }
+  
+      if (spinsCompleted < finalSpinCount) {
+        // 다음 인덱스로 순서대로 이동
+        const nextIndex = (index + 1) % players.length;
+        setTimeout(() => spin(nextIndex), speed);
+      } else {
+        // 최종 결과 표시 - 승자 아이템 강조
+        setWinner(players[index]);
+        setIsSpinning(false);
+        // 하이라이트는 유지 (제거하지 않음)
+  
+        // 게임 결과 저장
+        if (!dontRecord) {
+          saveGameResult(players[index]);
+        }
       }
     };
-    
-    spin();
+  
+    // 첫 번째 스핀 시작
+    spin(currentIndex);
   };
 
   const handleNameEdit = (index, newName) => {
@@ -273,6 +305,18 @@ export default function CoffeeGame() {
               <UserPlus className="w-4 h-4 mr-2" />
               참가자 추가
             </button>
+            <div className="flex items-center justify-center mt-2">
+              <input
+                type="checkbox"
+                id="dontRecord"
+                checked={dontRecord}
+                onChange={(e) => setDontRecord(e.target.checked)}
+                className="w-4 h-4 text-amber-600 bg-gray-100 border-gray-300 rounded focus:ring-amber-500"
+              />
+              <label htmlFor="dontRecord" className="ml-2 text-sm font-medium text-gray-900">
+                기록X
+              </label>
+            </div>
           </div>
         </div>
 
