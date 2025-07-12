@@ -19,6 +19,7 @@ export default function CoffeeGame() {
   const [isDataLoaded, setIsDataLoaded] = useState(false);
   const [showAllStats, setShowAllStats] = useState(false);
   const [dontRecord, setDontRecord] = useState(false);
+  const [showResultPopup, setShowResultPopup] = useState(false);
 
   const calculateStats = useCallback(() => {
     const newStats = {};
@@ -209,6 +210,10 @@ export default function CoffeeGame() {
         } else {
           setWinner(shuffledPlayers[index]);
           setIsSpinning(false);
+          // 스핀이 완전히 멈춘 후 0.5초 뒤에 팝업 표시
+          setTimeout(() => {
+            setShowResultPopup(true);
+          }, 500);
           if (!dontRecord) {
             saveGameResult(shuffledPlayers[index]);
           }
@@ -250,6 +255,7 @@ export default function CoffeeGame() {
     setIsSpinning(false);
     setCurrentHighlight(-1);
     setCountdown(0);
+    setShowResultPopup(false);
   };
 
   return (
@@ -398,19 +404,57 @@ export default function CoffeeGame() {
           </div>
         )}
 
-        {/* 결과 표시 */}
-        {winner && !isSpinning && (
-          <div className="bg-red-50 border-2 border-red-200 rounded-xl p-6 mb-6 text-center">
-            <Coffee className="w-12 h-12 text-red-600 mx-auto mb-3" />
-            <h3 className="text-2xl font-bold text-red-700 mb-2">🎉 결과 발표! 🎉</h3>
-            <p className="text-lg text-red-600 mb-2">
-              <span className="font-bold text-xl">{winner}</span>님이
-            </p>
-            <p className="text-lg text-red-600 font-semibold">
-              커피를 사주세요! ☕
-            </p>
+        {/* 결과 팝업 */}
+        {showResultPopup && winner && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+            <div className="bg-white rounded-2xl p-8 w-[400px] max-w-full mx-4 text-center shadow-2xl relative">
+              {/* 닫기 버튼 */}
+              <button
+                onClick={() => setShowResultPopup(false)}
+                className="absolute top-4 right-4 text-gray-400 hover:text-gray-600 transition-colors"
+              >
+                <X className="w-6 h-6" />
+              </button>
+              
+              {/* 결과 내용 */}
+              <div className="mb-6">
+                <div className="w-20 h-20 bg-gradient-to-br from-amber-400 to-orange-500 rounded-full flex items-center justify-center mx-auto mb-4 shadow-lg">
+                  <Coffee className="w-10 h-10 text-white" />
+                </div>
+                <h3 className="text-3xl font-bold text-gray-800 mb-4">🎉 결과 발표! 🎉</h3>
+                <div className="bg-gradient-to-r from-amber-50 to-orange-50 rounded-xl p-6 border-2 border-amber-200">
+                  <p className="text-lg text-gray-700 mb-2">
+                    <span className="font-bold text-2xl text-amber-600">{winner}</span>님이
+                  </p>
+                  <p className="text-xl text-amber-700 font-semibold">
+                    커피를 사주세요! ☕
+                  </p>
+                </div>
+              </div>
+              
+              {/* 액션 버튼들 */}
+              <div className="flex gap-3">
+                <button
+                  onClick={() => setShowResultPopup(false)}
+                  className="flex-1 py-3 px-6 bg-gray-500 hover:bg-gray-600 text-white font-semibold rounded-xl transition-colors duration-200"
+                >
+                  확인
+                </button>
+                <button
+                  onClick={() => {
+                    setShowResultPopup(false);
+                    resetGame();
+                  }}
+                  className="flex-1 py-3 px-6 bg-amber-500 hover:bg-amber-600 text-white font-semibold rounded-xl transition-colors duration-200"
+                >
+                  다시 하기
+                </button>
+              </div>
+            </div>
           </div>
         )}
+
+
 
         {/* 게임 버튼들 */}
         <div className="space-y-3">
@@ -422,15 +466,6 @@ export default function CoffeeGame() {
             <RotateCcw className={`w-6 h-6 mr-3 ${isSpinning ? 'animate-spin' : ''}`} />
             돌리기
           </button>
-
-          {winner && !isSpinning && (
-            <button
-              onClick={resetGame}
-              className="w-full py-3 px-6 rounded-xl font-medium border-2 border-amber-500 text-amber-600 hover:bg-amber-50 transition-colors duration-200"
-            >
-              다시 하기
-            </button>
-          )}
         </div>
         
         {/* 참가자 목록 */}
