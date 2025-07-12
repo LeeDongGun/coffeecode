@@ -189,11 +189,11 @@ export default function CoffeeGame2() {
       // 총 회전할 아이템 개수 계산
       const totalSpins = Math.floor(rotations * players.length);
       
-      // 더 간단하고 정확한 계산
-      // 당첨자가 정확히 중앙(인덱스 0 위치)에 오도록 계산
+      // 수정된 계산: 위로 스크롤하도록 양수 값 사용
       const winnerPosition = finalWinnerIndex * ITEM_HEIGHT;
       const fullRotationDistance = totalSpins * ITEM_HEIGHT;
-      const targetOffset = -(fullRotationDistance + winnerPosition);
+      // 위로 스크롤하도록 양수 값으로 변경
+      const targetOffset = fullRotationDistance + winnerPosition;
 
       console.log('회전 정보:', {
         finalWinnerIndex,
@@ -320,7 +320,7 @@ export default function CoffeeGame2() {
               <div 
                 className={`wheel-items absolute inset-x-0 w-full ${animationClass}`}
                 style={{
-                  transform: `translateY(${spinOffset + WHEEL_CENTER - (ITEM_HEIGHT / 2)}px)`,
+                  transform: `translateY(-${spinOffset + WHEEL_CENTER - (ITEM_HEIGHT / 2)}px)`,
                   transition: animationClass ? 'transform 4s cubic-bezier(0.17, 0.67, 0.15, 1)' : 'none'
                 }}
               >
