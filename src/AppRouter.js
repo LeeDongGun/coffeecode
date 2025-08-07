@@ -1,8 +1,9 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route, NavLink } from 'react-router-dom';
-import { Coffee, RotateCcw, Zap, Home } from 'lucide-react';
+import { Coffee, RotateCcw, Zap, Home, Spline } from 'lucide-react';
 import CoffeeGame from './App';
 import CoffeeGame2 from './App2';
+import LadderGame from './LadderGame';
 
 function HomePage() {
   return (
@@ -41,6 +42,21 @@ function HomePage() {
               <div className="text-left">
                 <h3 className="text-lg font-bold text-gray-800">iOS 스타일</h3>
                 <p className="text-sm text-gray-600">회전 휠 방식의 모던한 뽑기</p>
+              </div>
+            </div>
+          </NavLink>
+
+          <NavLink
+            to="/ladder-game"
+            className="block bg-white hover:bg-amber-50 border-2 border-amber-200 hover:border-amber-300 rounded-2xl p-6 shadow-lg transform transition-all duration-200 hover:scale-105"
+          >
+            <div className="flex items-center gap-4">
+              <div className="w-12 h-12 bg-green-500 rounded-full flex items-center justify-center">
+                <Spline className="w-6 h-6 text-white" />
+              </div>
+              <div className="text-left">
+                <h3 className="text-lg font-bold text-gray-800">사다리타기</h3>
+                <p className="text-sm text-gray-600">운명에 맡기는 클래식 게임</p>
               </div>
             </div>
           </NavLink>
@@ -85,6 +101,18 @@ function Navigation() {
             >
               iOS 스타일
             </NavLink>
+            <NavLink
+              to="/ladder-game"
+              className={({ isActive }) =>
+                `px-3 py-2 rounded-lg font-medium transition-colors ${
+                  isActive
+                    ? 'bg-amber-100 text-amber-700'
+                    : 'text-gray-600 hover:text-amber-600'
+                }`
+              }
+            >
+              사다리타기
+            </NavLink>
           </div>
         </div>
       </div>
@@ -108,6 +136,12 @@ export default function AppRouter() {
             <>
               <Navigation />
               <CoffeeGame2 />
+            </>
+          } />
+          <Route path="/ladder-game" element={
+            <>
+              <Navigation />
+              <LadderGame />
             </>
           } />
         </Routes>
