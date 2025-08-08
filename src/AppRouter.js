@@ -1,10 +1,11 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route, NavLink } from 'react-router-dom';
-import { Coffee, RotateCcw, Zap, Home, Spline, Bomb } from 'lucide-react';
+import { Coffee, RotateCcw, Zap, Home, Spline, Bomb, BrainCircuit } from 'lucide-react';
 import CoffeeGame from './App';
 import CoffeeGame2 from './App2';
 import LadderGame from './LadderGame';
 import BombGame from './BombGame';
+import WordGame from './WordGame';
 
 function HomePage() {
   return (
@@ -76,6 +77,21 @@ function HomePage() {
               </div>
             </div>
           </NavLink>
+
+          <NavLink
+            to="/word-game"
+            className="block bg-white hover:bg-amber-50 border-2 border-amber-200 hover:border-amber-300 rounded-2xl p-6 shadow-lg transform transition-all duration-200 hover:scale-105"
+          >
+            <div className="flex items-center gap-4">
+              <div className="w-12 h-12 bg-purple-500 rounded-full flex items-center justify-center">
+                <BrainCircuit className="w-6 h-6 text-white" />
+              </div>
+              <div className="text-left">
+                <h3 className="text-lg font-bold text-gray-800">단어 연상 게임</h3>
+                <p className="text-sm text-gray-600">창의력과 순발력 테스트</p>
+              </div>
+            </div>
+          </NavLink>
         </div>
       </div>
     </div>
@@ -92,11 +108,11 @@ function Navigation() {
             <span className="font-semibold">홈</span>
           </NavLink>
           
-          <div className="flex gap-2 text-sm">
+          <div className="flex gap-1 text-xs sm:text-sm sm:gap-2">
             <NavLink 
               to="/classic"
               className={({ isActive }) => 
-                `px-3 py-2 rounded-lg font-medium transition-colors ${
+                `px-2 py-2 sm:px-3 rounded-lg font-medium transition-colors ${
                   isActive 
                     ? 'bg-amber-100 text-amber-700' 
                     : 'text-gray-600 hover:text-amber-600'
@@ -108,7 +124,7 @@ function Navigation() {
             <NavLink 
               to="/ios-style"
               className={({ isActive }) => 
-                `px-3 py-2 rounded-lg font-medium transition-colors ${
+                `px-2 py-2 sm:px-3 rounded-lg font-medium transition-colors ${
                   isActive 
                     ? 'bg-amber-100 text-amber-700' 
                     : 'text-gray-600 hover:text-amber-600'
@@ -120,7 +136,7 @@ function Navigation() {
             <NavLink
               to="/ladder-game"
               className={({ isActive }) =>
-                `px-3 py-2 rounded-lg font-medium transition-colors ${
+                `px-2 py-2 sm:px-3 rounded-lg font-medium transition-colors ${
                   isActive
                     ? 'bg-amber-100 text-amber-700'
                     : 'text-gray-600 hover:text-amber-600'
@@ -132,7 +148,7 @@ function Navigation() {
             <NavLink
               to="/bomb-game"
               className={({ isActive }) =>
-                `px-3 py-2 rounded-lg font-medium transition-colors ${
+                `px-2 py-2 sm:px-3 rounded-lg font-medium transition-colors ${
                   isActive
                     ? 'bg-amber-100 text-amber-700'
                     : 'text-gray-600 hover:text-amber-600'
@@ -140,6 +156,18 @@ function Navigation() {
               }
             >
               폭탄
+            </NavLink>
+            <NavLink
+              to="/word-game"
+              className={({ isActive }) =>
+                `px-2 py-2 sm:px-3 rounded-lg font-medium transition-colors ${
+                  isActive
+                    ? 'bg-amber-100 text-amber-700'
+                    : 'text-gray-600 hover:text-amber-600'
+                }`
+              }
+            >
+              연상
             </NavLink>
           </div>
         </div>
@@ -176,6 +204,12 @@ export default function AppRouter() {
             <>
               <Navigation />
               <BombGame />
+            </>
+          } />
+          <Route path="/word-game" element={
+            <>
+              <Navigation />
+              <WordGame />
             </>
           } />
         </Routes>
