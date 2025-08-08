@@ -15,3 +15,13 @@ code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;
 }
+
+@keyframes bomb-shake {
+  0%, 100% { transform: translate(0, 0) rotate(0); }
+  10%, 30%, 50%, 70%, 90% { transform: translate(-2px, 0) rotate(-3deg); }
+  20%, 40%, 60%, 80% { transform: translate(2px, 0) rotate(3deg); }
+}
+
+.animate-bomb-shake {
+  animation: bomb-shake 0.5s infinite;
+}

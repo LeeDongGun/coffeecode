@@ -1,9 +1,10 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route, NavLink } from 'react-router-dom';
-import { Coffee, RotateCcw, Zap, Home, Spline } from 'lucide-react';
+import { Coffee, RotateCcw, Zap, Home, Spline, Bomb } from 'lucide-react';
 import CoffeeGame from './App';
 import CoffeeGame2 from './App2';
 import LadderGame from './LadderGame';
+import BombGame from './BombGame';
 
 function HomePage() {
   return (
@@ -60,6 +61,21 @@ function HomePage() {
               </div>
             </div>
           </NavLink>
+
+          <NavLink
+            to="/bomb-game"
+            className="block bg-white hover:bg-amber-50 border-2 border-amber-200 hover:border-amber-300 rounded-2xl p-6 shadow-lg transform transition-all duration-200 hover:scale-105"
+          >
+            <div className="flex items-center gap-4">
+              <div className="w-12 h-12 bg-gray-700 rounded-full flex items-center justify-center">
+                <Bomb className="w-6 h-6 text-white" />
+              </div>
+              <div className="text-left">
+                <h3 className="text-lg font-bold text-gray-800">폭탄 돌리기</h3>
+                <p className="text-sm text-gray-600">스릴 넘치는 시간 제한 게임</p>
+              </div>
+            </div>
+          </NavLink>
         </div>
       </div>
     </div>
@@ -76,7 +92,7 @@ function Navigation() {
             <span className="font-semibold">홈</span>
           </NavLink>
           
-          <div className="flex gap-4">
+          <div className="flex gap-2 text-sm">
             <NavLink 
               to="/classic"
               className={({ isActive }) => 
@@ -99,7 +115,7 @@ function Navigation() {
                 }`
               }
             >
-              iOS 스타일
+              iOS
             </NavLink>
             <NavLink
               to="/ladder-game"
@@ -111,7 +127,19 @@ function Navigation() {
                 }`
               }
             >
-              사다리타기
+              사다리
+            </NavLink>
+            <NavLink
+              to="/bomb-game"
+              className={({ isActive }) =>
+                `px-3 py-2 rounded-lg font-medium transition-colors ${
+                  isActive
+                    ? 'bg-amber-100 text-amber-700'
+                    : 'text-gray-600 hover:text-amber-600'
+                }`
+              }
+            >
+              폭탄
             </NavLink>
           </div>
         </div>
@@ -142,6 +170,12 @@ export default function AppRouter() {
             <>
               <Navigation />
               <LadderGame />
+            </>
+          } />
+          <Route path="/bomb-game" element={
+            <>
+              <Navigation />
+              <BombGame />
             </>
           } />
         </Routes>
